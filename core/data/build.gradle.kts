@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.google.dagger)
+    alias(libs.plugins.google.dagger.hilt)
     alias(libs.plugins.google.ksp)
     alias(libs.plugins.junit5)
 }
