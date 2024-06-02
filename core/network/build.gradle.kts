@@ -3,8 +3,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.google.dagger)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
+    alias(libs.plugins.google.dagger.hilt)
     alias(libs.plugins.google.ksp)
     alias(libs.plugins.secrets.gradle)
     alias(libs.plugins.junit5)

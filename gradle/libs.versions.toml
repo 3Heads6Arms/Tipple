@@ -11,6 +11,7 @@ lifecycleRuntimeKtx = "2.8.1"
 activityCompose = "1.9.0"
 composeBom = "2024.05.00"
 daggerHilt = "2.49"
+hiltCompose = "1.2.0"
 ksp = "2.0.0-1.0.21"
 retrofitBom = "2.11.0"
 okhttp = "4.12.0"
@@ -18,6 +19,7 @@ secretsGradle = "2.0.1"
 mockk = "1.13.11"
 truth = "1.4.2"
 junit5Plugin = "1.10.0.0"
+composeNavigation = "2.8.0-beta02"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,6 +37,8 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-nav-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "composeNavigation"}
+androidx-hilt-nav-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltCompose" }
 kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinSerialization" }
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinCoroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinCoroutines" }
@@ -53,10 +57,10 @@ truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-google-dagger = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
+google-dagger-hilt = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
 google-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 secrets-gradle = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secretsGradle" }
 junit5 = { id = "de.mannodermaus.android-junit5", version.ref = "junit5Plugin" }
