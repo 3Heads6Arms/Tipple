@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = "com.anhhoang.tipple.core.network"
+    namespace = "com.anhhoang.tipple.core.data"
     compileSdk = 34
 
     defaultConfig {
@@ -46,7 +46,14 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:network"))
     implementation(libs.kotlinx.coroutines)
     implementation(libs.dagger.hilt)
     ksp(libs.dagger.hilt.compiler)
+    testImplementation(libs.junit)
+    testRuntimeOnly(libs.junit.engine)
+    testImplementation(libs.mockk)
+    testImplementation(libs.mockk.agent)
+    testImplementation(libs.truth)
+    testImplementation(libs.kotlinx.coroutines.test)
 }
