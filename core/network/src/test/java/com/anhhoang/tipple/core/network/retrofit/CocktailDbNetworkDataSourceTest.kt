@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlin.test.assertFailsWith
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -17,7 +18,7 @@ class CocktailDbNetworkDataSourceTest {
 
     @BeforeEach
     fun setUp() {
-        dataSource = CocktailDbNetworkDataSource(api)
+        dataSource = CocktailDbNetworkDataSource(api, StandardTestDispatcher())
     }
 
     @Test
