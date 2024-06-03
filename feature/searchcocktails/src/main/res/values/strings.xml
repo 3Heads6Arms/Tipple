@@ -5,5 +5,6 @@
     <string name="close_icon">Close icon</string>
     <string name="retry">Retry</string>
     <string name="something_went_wrong">Oops, something went wrong</string>
-    <string name="such_emptiness">Such emptiness...</string>
+    <string name="such_emptiness">Such emptiness…</string>
+    <string name="add_to_favorites">Add to favorites</string>
 </resources>
