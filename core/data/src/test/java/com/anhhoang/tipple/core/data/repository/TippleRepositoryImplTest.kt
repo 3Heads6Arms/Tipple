@@ -23,7 +23,6 @@ class TippleRepositoryImplTest {
         repository = TippleRepositoryImpl(dataSource)
     }
 
-
     @Test
     fun searchCocktails_success_expectCocktailsSuccess() = runTest {
         val cocktails = listOf(testCocktail)
@@ -55,6 +54,41 @@ class TippleRepositoryImplTest {
         coEvery { dataSource.searchCocktails(any()) } throws exception
 
         val result =  repository.searchCocktails("Cocktail 1")
+
+        assertThat(result).isEqualTo(Resource.Error(exception))
+    }
+
+    @Test
+    fun getCocktailById_success_expectCocktailsSuccess() = runTest {
+        val cocktails = listOf(testCocktail)
+        coEvery { dataSource.getCocktailsById(any()) } returns cocktails
+        val expectedCocktail = Cocktail(
+            id = testCocktail.id,
+            name = testCocktail.name,
+            instructions = testCocktail.instructions,
+            servingGlass = testCocktail.glass,
+            thumbnail = testCocktail.image,
+            image = testCocktail.image,
+            generation = testCocktail.generation,
+            type = testCocktail.type,
+            category = testCocktail.category,
+            ingredients = listOf(
+                Ingredient("Ingredient 1", "Measure 1"),
+                Ingredient("Ingredient 2", "Measure 2"),
+            )
+        )
+
+        val result = repository.getCocktailById(1)
+
+        assertThat(result).isEqualTo(Resource.Success(expectedCocktail))
+    }
+
+    @Test
+    fun getCocktailById_failure_expectResourceError() = runTest {
+        val exception = RuntimeException("Test")
+        coEvery { dataSource.getCocktailsById(any()) } throws exception
+
+        val result =  repository.getCocktailById(1)
 
         assertThat(result).isEqualTo(Resource.Error(exception))
     }
