@@ -27,6 +27,7 @@ class SearchCocktailsViewModel @Inject constructor(
                 is Resource.Success -> {
                     _state.value = _state.value.copy(
                         isLoading = false,
+                        hasError = false,
                         cocktails = it.data,
                     )
                 }
