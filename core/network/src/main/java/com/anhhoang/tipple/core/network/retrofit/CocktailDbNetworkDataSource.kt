@@ -6,7 +6,6 @@ import com.anhhoang.tipple.core.network.model.NetworkCocktail
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import retrofit2.http.GET
@@ -23,16 +22,24 @@ class CocktailDbNetworkDataSource @Inject internal constructor(
         withContext(blockingContext) {
             api.searchCocktails(name).drinks
         }
+
+    override suspend fun getCocktailsById(id: Int): List<NetworkCocktail> =
+        withContext(blockingContext) {
+            api.getCocktailsById(id).drinks
+        }
 }
 
 /** Exact DTO for the search endpoint. */
 @Serializable
-internal data class SearchCocktailsResponse(
+internal data class CocktailsResponse(
     val drinks: List<NetworkCocktail> = emptyList()
 )
 
 /** Endpoints of TheCocktailDb. */
 internal interface CocktailDbApi {
     @GET("search.php")
-    suspend fun searchCocktails(@Query("s") name: String): SearchCocktailsResponse
+    suspend fun searchCocktails(@Query("s") name: String): CocktailsResponse
+
+    @GET("lookup.php")
+    suspend fun getCocktailsById(@Query("i") id: Int): CocktailsResponse
 }
