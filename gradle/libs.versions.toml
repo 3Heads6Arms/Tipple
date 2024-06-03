@@ -22,16 +22,19 @@ junit5Plugin = "1.10.0.0"
 composeNavigation = "2.8.0-beta02"
 coil = "2.6.0"
 multidex = "2.0.1"
+junit4 = "4.13.2"
+turbine = "0.12.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+junit4 = { group = "junit", name = "junit", version.ref = "junit4" }
 junit = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
 junit-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleRuntimeKtx" }
-androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeKtx"}
+androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
@@ -41,9 +44,9 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-androidx-nav-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "composeNavigation"}
+androidx-nav-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "composeNavigation" }
 androidx-hilt-nav-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltCompose" }
-androidx-multidex = { group = "androidx.multidex", name = "multidex", version.ref = "multidex"}
+androidx-multidex = { group = "androidx.multidex", name = "multidex", version.ref = "multidex" }
 kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinSerialization" }
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinCoroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinCoroutines" }
@@ -56,9 +59,11 @@ squareup-okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref
 squareup-okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 secrets-gradle = { group = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", name = "secrets-gradle-plugin", version.ref = "secretsGradle" }
 mockk = { group = "io.mockk", name = "mockk-jvm", version.ref = "mockk" }
+mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
 mockk-agent = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
-coil = { group = "io.coil-kt", name = "coil", version.ref = "coil"}
+coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
