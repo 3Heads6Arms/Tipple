@@ -17,6 +17,8 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -73,10 +75,10 @@ fun SearchCocktailsScreen(state: SearchCocktailsState, onAction: (SearchCocktail
                 onClearSearch = { onAction(SearchCocktailsAction.Search("")) },
             )
         },
-    ) {
+    ) { paddingValues ->
         Box(
             modifier = Modifier
-                .padding(it)
+                .padding(paddingValues)
                 .fillMaxSize()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             contentAlignment = Alignment.Center,
@@ -88,14 +90,16 @@ fun SearchCocktailsScreen(state: SearchCocktailsState, onAction: (SearchCocktail
             } else if (state.cocktails.isEmpty()) {
                 EmptyCocktailList()
             } else {
-                CocktailList(state.cocktails)
+                CocktailList(state.cocktails) {
+                    onAction(SearchCocktailsAction.OpenCocktail(it))
+                }
             }
         }
     }
 }
 
 @Composable
-private fun CocktailList(cocktails: List<Cocktail>) {
+private fun CocktailList(cocktails: List<Cocktail>, onCocktailClick: (Int) -> Unit) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -103,35 +107,41 @@ private fun CocktailList(cocktails: List<Cocktail>) {
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(cocktails) {
-            CocktailItem(cocktail = it)
+            CocktailItem(cocktail = it) { onCocktailClick(it.id) }
         }
     }
 }
 
 @Composable
-private fun CocktailItem(cocktail: Cocktail) {
-    Row(
+private fun CocktailItem(cocktail: Cocktail, onCocktailClick: () -> Unit) {
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .testTag(SEARCH_RESULT),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        onClick = onCocktailClick,
     ) {
-        CocktailImage(cocktail.image, cocktail.name)
-        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.SpaceBetween) {
-            Text(text = cocktail.name, style = MaterialTheme.typography.titleMedium)
-            Text(
-                text = cocktail.instructions,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.labelMedium
-            )
-        }
-        IconButton(onClick = { /*TODO*/ }) {
-            Icon(
-                imageVector = Icons.Default.FavoriteBorder,
-                contentDescription = stringResource(R.string.add_to_favorites)
-            )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            CocktailImage(cocktail.image, cocktail.name)
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.SpaceBetween) {
+                Text(text = cocktail.name, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = cocktail.instructions,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(
+                    imageVector = Icons.Default.FavoriteBorder,
+                    contentDescription = stringResource(R.string.add_to_favorites)
+                )
+            }
         }
     }
 }

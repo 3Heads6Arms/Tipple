@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SearchCocktailsViewModel @Inject constructor(
@@ -46,6 +45,7 @@ class SearchCocktailsViewModel @Inject constructor(
         when (action) {
             is SearchCocktailsAction.Search -> getCocktails(action.query)
             SearchCocktailsAction.Retry -> getCocktails()
+            is SearchCocktailsAction.OpenCocktail -> {}
         }
     }
 
@@ -55,9 +55,7 @@ class SearchCocktailsViewModel @Inject constructor(
             isLoading = true,
             hasError = false,
         )
-        viewModelScope.launch {
-            searchCocktails(searchQuery)
-        }
+        searchCocktails(searchQuery)
     }
 }
 
@@ -73,4 +71,5 @@ data class SearchCocktailsState(
 sealed interface SearchCocktailsAction {
     data class Search(val query: String) : SearchCocktailsAction
     data object Retry : SearchCocktailsAction
+    data class OpenCocktail(val id: Int) : SearchCocktailsAction
 }
