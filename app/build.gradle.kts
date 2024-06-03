@@ -57,6 +57,7 @@ android {
 dependencies {
     implementation(project(":design"))
     implementation(project(":feature:searchcocktails"))
+    implementation(project(":core:network"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -72,6 +73,7 @@ dependencies {
     implementation(libs.androidx.hilt.nav.compose)
     implementation(libs.dagger.hilt)
     implementation(libs.kotlinx.serialization)
+    implementation(libs.coil)
     ksp(libs.dagger.hilt.compiler)
     implementation(libs.androidx.multidex)
     androidTestImplementation(libs.androidx.junit)
