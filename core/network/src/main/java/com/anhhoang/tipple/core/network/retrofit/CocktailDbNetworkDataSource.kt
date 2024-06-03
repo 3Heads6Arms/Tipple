@@ -1,9 +1,11 @@
 package com.anhhoang.tipple.core.network.retrofit
 
+import com.anhhoang.tipple.core.coroutines.BlockingContext
 import com.anhhoang.tipple.core.network.TippleNetworkDataSource
 import com.anhhoang.tipple.core.network.model.NetworkCocktail
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -14,11 +16,13 @@ import retrofit2.http.Query
 @Singleton
 class CocktailDbNetworkDataSource @Inject internal constructor(
     private val api: CocktailDbApi,
+    @BlockingContext private val blockingContext: CoroutineContext,
 ) : TippleNetworkDataSource {
 
-    override suspend fun searchCocktails(name: String): List<NetworkCocktail> = withContext(Dispatchers.IO) {
-        api.searchCocktails(name).drinks
-    }
+    override suspend fun searchCocktails(name: String): List<NetworkCocktail> =
+        withContext(blockingContext) {
+            api.searchCocktails(name).drinks
+        }
 }
 
 /** Exact DTO for the search endpoint. */
