@@ -4,7 +4,7 @@ package com.anhhoang.tipple.core.data.model
 data class Cocktail(
     val id: Int,
     val name: String,
-    val ingredients: List<Ingredient>,
+    val ingredients: List<String>,
     val instructions: String,
     val thumbnail: String,
     val image: String,

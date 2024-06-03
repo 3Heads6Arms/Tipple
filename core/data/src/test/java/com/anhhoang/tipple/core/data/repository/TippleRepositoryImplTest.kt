@@ -1,7 +1,6 @@
 package com.anhhoang.tipple.core.data.repository
 
 import com.anhhoang.tipple.core.data.model.Cocktail
-import com.anhhoang.tipple.core.data.model.Ingredient
 import com.anhhoang.tipple.core.data.model.Resource
 import com.anhhoang.tipple.core.network.TippleNetworkDataSource
 import com.anhhoang.tipple.core.network.model.NetworkCocktail
@@ -38,8 +37,8 @@ class TippleRepositoryImplTest {
             type = testCocktail.type,
             category = testCocktail.category,
             ingredients = listOf(
-                Ingredient("Ingredient 1", "Measure 1"),
-                Ingredient("Ingredient 2", "Measure 2"),
+                "Ingredient 1",
+                "Ingredient 2",
             )
         )
 
@@ -53,7 +52,7 @@ class TippleRepositoryImplTest {
         val exception = RuntimeException("Test")
         coEvery { dataSource.searchCocktails(any()) } throws exception
 
-        val result =  repository.searchCocktails("Cocktail 1")
+        val result = repository.searchCocktails("Cocktail 1")
 
         assertThat(result).isEqualTo(Resource.Error(exception))
     }
@@ -73,8 +72,8 @@ class TippleRepositoryImplTest {
             type = testCocktail.type,
             category = testCocktail.category,
             ingredients = listOf(
-                Ingredient("Ingredient 1", "Measure 1"),
-                Ingredient("Ingredient 2", "Measure 2"),
+                "Ingredient 1",
+                "Ingredient 2",
             )
         )
 
@@ -88,7 +87,7 @@ class TippleRepositoryImplTest {
         val exception = RuntimeException("Test")
         coEvery { dataSource.getCocktailsById(any()) } throws exception
 
-        val result =  repository.getCocktailById(1)
+        val result = repository.getCocktailById(1)
 
         assertThat(result).isEqualTo(Resource.Error(exception))
     }

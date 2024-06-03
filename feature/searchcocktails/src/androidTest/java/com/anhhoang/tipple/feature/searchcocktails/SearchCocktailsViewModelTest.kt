@@ -3,7 +3,6 @@ package com.anhhoang.tipple.feature.searchcocktails
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.anhhoang.tipple.core.data.model.Cocktail
-import com.anhhoang.tipple.core.data.model.Ingredient
 import com.anhhoang.tipple.core.data.model.Resource
 import com.anhhoang.tipple.core.data.repository.TippleRepository
 import com.anhhoang.tipple.feature.searchcocktails.usecase.SearchCocktailsUseCase
@@ -106,8 +105,8 @@ class SearchCocktailsViewModelTest {
             name = "Cocktail 1",
             instructions = "Instructions 1",
             ingredients = listOf(
-                Ingredient("Ingredient 1", "Measure 1"),
-                Ingredient("Ingredient 2", "Measure 2"),
+                "Ingredient 1",
+                "Ingredient 2",
             ),
             servingGlass = "Glass 1",
             thumbnail = "Image 1",
