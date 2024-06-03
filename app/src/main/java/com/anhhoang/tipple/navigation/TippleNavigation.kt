@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsAction
 import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreen
 import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsViewModel
 
@@ -17,13 +18,20 @@ fun TippleNavigation(
     navController: NavHostController = rememberNavController()
 ) {
     NavHost(
-        navController = navController,
-        startDestination = MainScreen
+        navController = navController, startDestination = MainScreen
     ) {
         composable<MainScreen> {
             val viewModel = hiltViewModel<SearchCocktailsViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle()
-            SearchCocktailsScreen(state, onAction = viewModel::onAction)
+            SearchCocktailsScreen(state) {
+                when (it) {
+                    is SearchCocktailsAction.OpenCocktail -> {
+                        navController.navigate(DetailsScreen(it.id))
+                    }
+
+                    else -> viewModel.onAction(it)
+                }
+            }
         }
         composable<DetailsScreen> {
 
