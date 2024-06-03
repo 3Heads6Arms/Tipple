@@ -10,12 +10,17 @@ import javax.inject.Inject
 class TippleRepositoryImpl @Inject internal constructor(
     private val tippleNetworkDataSource: TippleNetworkDataSource,
 ) : TippleRepository {
-    override suspend fun searchCocktails(name: String): Resource<List<Cocktail>> {
-        try {
-            val cocktails = tippleNetworkDataSource.searchCocktails(name).map { it.toCocktail() }
-            return Resource.Success(cocktails)
-        } catch (e: Exception) {
-            return Resource.Error(e)
-        }
+    override suspend fun searchCocktails(name: String): Resource<List<Cocktail>> = try {
+        val cocktails = tippleNetworkDataSource.searchCocktails(name).map { it.toCocktail() }
+        Resource.Success(cocktails)
+    } catch (e: Exception) {
+        Resource.Error(e)
+    }
+
+    override suspend fun getCocktailById(id: Int): Resource<Cocktail> = try {
+        val cocktail = tippleNetworkDataSource.getCocktailsById(id).first().toCocktail()
+        Resource.Success(cocktail)
+    } catch (e: Exception) {
+        Resource.Error(e)
     }
 }
