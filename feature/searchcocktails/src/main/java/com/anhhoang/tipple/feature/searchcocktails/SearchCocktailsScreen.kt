@@ -48,12 +48,16 @@ import com.anhhoang.tipple.core.data.model.Cocktail
 import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.EMPTY_LIST
 import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.SEARCH_BAR
 import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.SEARCH_ERROR
+import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.SEARCH_LOADING
+import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.SEARCH_RESULT
 import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.SEARCH_RESULTS
 
 @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
 object SearchCocktailsScreenTestTags {
     const val SEARCH_BAR = "SEARCH_BAR"
     const val SEARCH_RESULTS = "SEARCH_RESULTS"
+    const val SEARCH_RESULT = "SEARCH_RESULT"
+    const val SEARCH_LOADING = "SEARCH_LOADING"
     const val SEARCH_ERROR = "SEARCH_ERROR"
     const val EMPTY_LIST = "EMPTY_LIST"
 }
@@ -78,7 +82,7 @@ fun SearchCocktailsScreen(state: SearchCocktailsState, onAction: (SearchCocktail
             contentAlignment = Alignment.Center,
         ) {
             if (state.isLoading) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(modifier = Modifier.testTag(SEARCH_LOADING))
             } else if (state.hasError) {
                 SearchCocktailsError { onAction(SearchCocktailsAction.Retry) }
             } else if (state.cocktails.isEmpty()) {
@@ -107,7 +111,9 @@ private fun CocktailList(cocktails: List<Cocktail>) {
 @Composable
 private fun CocktailItem(cocktail: Cocktail) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(SEARCH_RESULT),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
