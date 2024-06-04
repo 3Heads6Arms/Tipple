@@ -44,14 +44,15 @@ dependencies {
     implementation(libs.kotlinx.coroutines)
     implementation(libs.androidx.room)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.datastore.pref)
     ksp(libs.androidx.room.compiler)
     implementation(libs.dagger.hilt)
     ksp(libs.dagger.hilt.compiler)
 
-
     testImplementation(libs.junit4)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.room.test)
+    testImplementation(libs.androidx.datastore.pref)
     testImplementation(libs.androidx.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.truth)
