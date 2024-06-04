@@ -71,6 +71,15 @@ class CocktailDetailsScreenTest {
         assertThat(capturedAction).isEqualTo(CocktailDetailsAction.GoBack)
     }
 
+    @Test
+    fun favouriteClick_expectFavouriteAction() {
+        setUp(CocktailDetailsState(isLoading = false, cocktail = cocktail))
+
+        composeRule.onNodeWithContentDescription("Add to favorites").performClick()
+
+        assertThat(capturedAction).isEqualTo(CocktailDetailsAction.FavouriteToggle)
+    }
+
     private fun setUp(state: CocktailDetailsState) {
         composeRule.setContent {
             CocktailDetailsScreen(state) { capturedAction = it }
