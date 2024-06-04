@@ -1,19 +1,18 @@
 package com.anhhoang.tipple.core.data.repository
 
 import app.cash.turbine.test
-import com.anhhoang.tipple.core.data.extensions.toCocktail
 import com.anhhoang.tipple.core.data.model.Cocktail
 import com.anhhoang.tipple.core.data.model.Resource
 import com.anhhoang.tipple.core.database.TippleLocalDataSource
-import com.anhhoang.tipple.core.database.model.FavouriteCocktailEntity
+import com.anhhoang.tipple.core.database.model.CocktailOfTheDay
 import com.anhhoang.tipple.core.network.TippleNetworkDataSource
 import com.anhhoang.tipple.core.network.model.NetworkCocktail
-import com.google.common.base.Verify.verify
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import java.time.LocalDate
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -30,27 +29,11 @@ class TippleRepositoryImplTest {
 
     @Test
     fun searchCocktails_success_expectCocktailsSuccess() = runTest(testDispatcher) {
-        val cocktails = listOf(networkCocktail)
-        coEvery { networkDataSource.searchCocktails(any()) } returns cocktails
-        val expectedCocktail = Cocktail(
-            id = networkCocktail.id,
-            name = networkCocktail.name,
-            instructions = networkCocktail.instructions,
-            servingGlass = networkCocktail.glass,
-            thumbnail = networkCocktail.image,
-            image = networkCocktail.image,
-            generation = networkCocktail.generation,
-            type = networkCocktail.type,
-            category = networkCocktail.category,
-            ingredients = listOf(
-                "Ingredient 1 Measure 1",
-                "Ingredient 2 Measure 2",
-            )
-        )
+        coEvery { networkDataSource.searchCocktails(any()) } returns listOf(networkCocktail)
 
         val result = repository.searchCocktails("Cocktail 1")
 
-        assertThat(result).isEqualTo(Resource.Success(listOf(expectedCocktail)))
+        assertThat(result).isEqualTo(Resource.Success(listOf(cocktail)))
     }
 
     @Test
@@ -65,33 +48,17 @@ class TippleRepositoryImplTest {
 
     @Test
     fun getCocktailById_success_expectCocktailsSuccess() = runTest(testDispatcher) {
-        val cocktails = listOf(networkCocktail)
-        coEvery { networkDataSource.getCocktailsById(any()) } returns cocktails
-        val expectedCocktail = Cocktail(
-            id = networkCocktail.id,
-            name = networkCocktail.name,
-            instructions = networkCocktail.instructions,
-            servingGlass = networkCocktail.glass,
-            thumbnail = networkCocktail.image,
-            image = networkCocktail.image,
-            generation = networkCocktail.generation,
-            type = networkCocktail.type,
-            category = networkCocktail.category,
-            ingredients = listOf(
-                "Ingredient 1 Measure 1",
-                "Ingredient 2 Measure 2",
-            )
-        )
+        coEvery { networkDataSource.getCocktailById(any()) } returns listOf(networkCocktail)
 
         val result = repository.getCocktailById(1)
 
-        assertThat(result).isEqualTo(Resource.Success(expectedCocktail))
+        assertThat(result).isEqualTo(Resource.Success(cocktail))
     }
 
     @Test
     fun getCocktailById_failure_expectResourceError() = runTest(testDispatcher) {
         val exception = RuntimeException("Test")
-        coEvery { networkDataSource.getCocktailsById(any()) } throws exception
+        coEvery { networkDataSource.getCocktailById(any()) } throws exception
 
         val result = repository.getCocktailById(1)
 
@@ -132,6 +99,46 @@ class TippleRepositoryImplTest {
         coVerify { localDataSource.deleteFavouriteCocktailById(1) }
     }
 
+    @Test
+    fun getRandomCocktail_success_expectCocktailsSuccess() = runTest(testDispatcher) {
+        coEvery { networkDataSource.getRandomCocktail() } returns listOf(networkCocktail)
+
+        val result = repository.getRandomCocktail()
+
+        assertThat(result).isEqualTo(Resource.Success(cocktail))
+    }
+
+    @Test
+    fun getRandomCocktail_error_expectCocktailOfTheDay() = runTest(testDispatcher) {
+        val exception = RuntimeException("Test")
+        coEvery { networkDataSource.getRandomCocktail() } throws exception
+
+        val result = repository.getRandomCocktail()
+
+        assertThat(result).isEqualTo(Resource.Error(exception))
+    }
+
+    @Test
+    fun getCocktailOfTheDay_withCocktailSaved_expectCocktailOfTheDay() = runTest(testDispatcher) {
+        val cocktailOfTheDay = CocktailOfTheDay(1, LocalDate.now())
+        every { localDataSource.getCocktailOfTheDay() } returns flowOf(cocktailOfTheDay)
+
+        repository.getCocktailOfTheDay().test {
+            assertThat(awaitItem()).isEqualTo(cocktailOfTheDay)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun getCocktailOfTheDay_withoutCocktailSaved_expectCocktailOfTheDay() =
+        runTest(testDispatcher) {
+            every { localDataSource.getCocktailOfTheDay() } returns flowOf(null)
+
+            repository.getCocktailOfTheDay().test {
+                assertThat(awaitItem()).isEqualTo(null)
+                awaitComplete()
+            }
+        }
 
     companion object {
         private val networkCocktail = NetworkCocktail(
@@ -173,6 +180,22 @@ class TippleRepositoryImplTest {
             measure14 = null,
             ingredient15 = null,
             measure15 = null,
+        )
+
+        private val cocktail = Cocktail(
+            id = networkCocktail.id,
+            name = networkCocktail.name,
+            instructions = networkCocktail.instructions,
+            servingGlass = networkCocktail.glass,
+            thumbnail = networkCocktail.image,
+            image = networkCocktail.image,
+            generation = networkCocktail.generation,
+            type = networkCocktail.type,
+            category = networkCocktail.category,
+            ingredients = listOf(
+                "Ingredient 1 Measure 1",
+                "Ingredient 2 Measure 2",
+            )
         )
     }
 }

@@ -19,5 +19,8 @@ interface TippleNetworkDataSource {
      * @param id The id of the cocktail.
      * @return A list of cocktails with the given id. (It's just the way API is designed ¯\_(ツ)_/¯)
      */
-    suspend fun getCocktailsById(id: Int): List<NetworkCocktail>
+    suspend fun getCocktailById(id: Int): List<NetworkCocktail>
+
+    /** Get a random cocktail. */
+    suspend fun getRandomCocktail(): List<NetworkCocktail>
 }

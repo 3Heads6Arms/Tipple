@@ -46,7 +46,7 @@ class CocktailDbNetworkDataSourceTest {
             listOf(testCocktail)
         )
 
-        val result = dataSource.getCocktailsById(1)
+        val result = dataSource.getCocktailById(1)
 
         assertThat(result).containsExactly(testCocktail)
     }
@@ -55,7 +55,18 @@ class CocktailDbNetworkDataSourceTest {
     fun getCocktailsById_failure_expectExceptionPropagated() = runTest(testDispatcher) {
         coEvery { api.getCocktailsById(any()) } throws RuntimeException("Test")
 
-        assertFailsWith<RuntimeException>(message = "test") { dataSource.getCocktailsById(1) }
+        assertFailsWith<RuntimeException>(message = "test") { dataSource.getCocktailById(1) }
+    }
+
+    @Test
+    fun getRandomCocktail_success_expectExactCocktails() = runTest(testDispatcher) {
+        coEvery { api.getRandomCocktail() } returns CocktailsResponse(
+            listOf(testCocktail)
+        )
+
+        val result = dataSource.getRandomCocktail()
+
+        assertThat(result).containsExactly(testCocktail)
     }
 
     companion object {

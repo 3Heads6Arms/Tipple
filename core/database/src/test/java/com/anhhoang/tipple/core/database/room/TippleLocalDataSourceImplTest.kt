@@ -1,12 +1,19 @@
 package com.anhhoang.tipple.core.database.room
 
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import app.cash.turbine.test
 import com.anhhoang.tipple.core.database.TippleLocalDataSource
-import com.anhhoang.tipple.core.database.model.FavouriteCocktailEntity
+import com.anhhoang.tipple.core.database.model.CocktailOfTheDay
 import com.google.common.truth.Truth.assertThat
+import java.time.LocalDate
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Test
@@ -16,14 +23,23 @@ import org.robolectric.RobolectricTestRunner
 /** Test implementation of the Local data source for the Tipple app. */
 @RunWith(RobolectricTestRunner::class)
 class TippleLocalDataSourceImplTest {
-
+    private val context = ApplicationProvider.getApplicationContext<Context>()
     private val testDispatcher = StandardTestDispatcher()
     private val database = Room.inMemoryDatabaseBuilder(
-        ApplicationProvider.getApplicationContext(), TippleDatabase::class.java,
+        context,
+        TippleDatabase::class.java,
     ).allowMainThreadQueries().build()
+    private val testDataStore: DataStore<Preferences> = PreferenceDataStoreFactory.create(
+        scope = TestScope(testDispatcher),
+        produceFile = { context.preferencesDataStoreFile("test_preferences") },
+    )
 
     private val tippleLocalDataSource: TippleLocalDataSource =
-        TippleLocalDataSourceImpl(testDispatcher, database.favouriteCocktailDao())
+        TippleLocalDataSourceImpl(
+            coroutineContext = testDispatcher,
+            favouriteCocktailDao = database.favouriteCocktailDao(),
+            dataStore = testDataStore,
+        )
 
     @After
     fun tearDown() {
@@ -60,6 +76,23 @@ class TippleLocalDataSourceImplTest {
             tippleLocalDataSource.deleteFavouriteCocktailById(1)
 
             assertThat(awaitItem()).isNull()
+        }
+    }
+
+    @Test
+    fun getCocktailOfTheDay_defaults_expectNull() = runTest(testDispatcher) {
+        tippleLocalDataSource.getCocktailOfTheDay().test {
+            assertThat(awaitItem()).isNull()
+        }
+    }
+
+    @Test
+    fun saveCocktailOfTheDay_expectValueSaved() = runTest(testDispatcher) {
+        val cocktailOfTheDay = CocktailOfTheDay(1, LocalDate.now())
+        tippleLocalDataSource.saveCocktailOfTheDay(cocktailOfTheDay)
+
+        tippleLocalDataSource.getCocktailOfTheDay().test {
+            assertThat(awaitItem()).isEqualTo(cocktailOfTheDay)
         }
     }
 }
