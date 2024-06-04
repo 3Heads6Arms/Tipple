@@ -47,13 +47,14 @@ android {
 
 dependencies {
     implementation(project(":core:network"))
+    implementation(project(":core:database"))
     implementation(libs.kotlinx.coroutines)
     implementation(libs.dagger.hilt)
     ksp(libs.dagger.hilt.compiler)
     testImplementation(libs.junit)
     testRuntimeOnly(libs.junit.engine)
     testImplementation(libs.mockk)
-    testImplementation(libs.mockk.agent)
     testImplementation(libs.truth)
+    testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test)
 }
