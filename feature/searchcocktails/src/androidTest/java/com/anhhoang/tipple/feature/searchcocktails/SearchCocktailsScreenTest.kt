@@ -4,7 +4,9 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -92,6 +94,15 @@ class SearchCocktailsScreenTest {
         composeRule.onNodeWithText("Mojito").performClick()
 
         assertThat(capturedAction).isEqualTo(SearchCocktailsAction.OpenCocktail(1))
+    }
+
+    @Test
+    fun onFavouriteClick_expectFavouriteAction() {
+        setUp(SearchCocktailsState(cocktails = cocktails))
+
+        composeRule.onAllNodesWithContentDescription("Add to favorites").onFirst().performClick()
+
+        assertThat(capturedAction).isEqualTo(SearchCocktailsAction.FavouriteToggle(1))
     }
 
     private fun setUp(state: SearchCocktailsState) {

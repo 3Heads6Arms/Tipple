@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
@@ -32,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -90,16 +92,22 @@ fun SearchCocktailsScreen(state: SearchCocktailsState, onAction: (SearchCocktail
             } else if (state.cocktails.isEmpty()) {
                 EmptyCocktailList()
             } else {
-                CocktailList(state.cocktails) {
-                    onAction(SearchCocktailsAction.OpenCocktail(it))
-                }
+                CocktailList(
+                    state.cocktails,
+                    onCocktailClick = { onAction(SearchCocktailsAction.OpenCocktail(it)) },
+                    onFavouriteClick = { onAction(SearchCocktailsAction.FavouriteToggle(it)) },
+                )
             }
         }
     }
 }
 
 @Composable
-private fun CocktailList(cocktails: List<Cocktail>, onCocktailClick: (Int) -> Unit) {
+private fun CocktailList(
+    cocktails: List<Cocktail>,
+    onCocktailClick: (Int) -> Unit,
+    onFavouriteClick: (Int) -> Unit
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -107,13 +115,21 @@ private fun CocktailList(cocktails: List<Cocktail>, onCocktailClick: (Int) -> Un
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(cocktails) {
-            CocktailItem(cocktail = it) { onCocktailClick(it.id) }
+            CocktailItem(
+                cocktail = it,
+                onCocktailClick = { onCocktailClick(it.id) },
+                onFavouriteClick = { onFavouriteClick(it.id) },
+            )
         }
     }
 }
 
 @Composable
-private fun CocktailItem(cocktail: Cocktail, onCocktailClick: () -> Unit) {
+private fun CocktailItem(
+    cocktail: Cocktail,
+    onCocktailClick: () -> Unit,
+    onFavouriteClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -136,10 +152,14 @@ private fun CocktailItem(cocktail: Cocktail, onCocktailClick: () -> Unit) {
                     style = MaterialTheme.typography.labelMedium
                 )
             }
-            IconButton(onClick = { /*TODO*/ }) {
+            val icon =
+                if (cocktail.isFavourite) Icons.Default.Favorite else Icons.Default.FavoriteBorder
+            val tint = if (cocktail.isFavourite) Color.Red else MaterialTheme.colorScheme.onSurface
+            IconButton(onClick = onFavouriteClick) {
                 Icon(
-                    imageVector = Icons.Default.FavoriteBorder,
-                    contentDescription = stringResource(R.string.add_to_favorites)
+                    imageVector = icon,
+                    contentDescription = stringResource(R.string.add_to_favorites),
+                    tint = tint,
                 )
             }
         }

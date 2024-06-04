@@ -5,19 +5,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.anhhoang.tipple.core.data.model.Cocktail
 import com.anhhoang.tipple.core.data.model.Resource
+import com.anhhoang.tipple.core.data.repository.TippleRepository
 import com.anhhoang.tipple.feature.cocktaildetails.usecase.GetCocktailUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 /** ViewModel for the cocktail details screen. */
 @HiltViewModel
 class CocktailDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getCocktail: GetCocktailUseCase,
+    private val repository: TippleRepository,
 ) : ViewModel() {
     private val cocktailId: Int = checkNotNull(savedStateHandle["id"])
     private val _state =
@@ -25,13 +28,16 @@ class CocktailDetailsViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     init {
-        getCocktail.flow.onEach {
-            when (it) {
+        combine(
+            getCocktail.flow,
+            repository.getFavouriteCocktailById(cocktailId)
+        ) { cocktailResult, favourite ->
+            when (cocktailResult) {
                 is Resource.Success -> {
                     _state.value = _state.value.copy(
                         isLoading = false,
                         hasError = false,
-                        cocktail = it.data,
+                        cocktail = cocktailResult.data.copy(isFavourite = favourite != null),
                     )
                 }
 
@@ -50,7 +56,20 @@ class CocktailDetailsViewModel @Inject constructor(
     fun onAction(action: CocktailDetailsAction) {
         when (action) {
             CocktailDetailsAction.Retry -> getCocktail()
+            CocktailDetailsAction.FavouriteToggle -> toggleFavourite()
             CocktailDetailsAction.GoBack -> {}
+        }
+    }
+
+    private fun toggleFavourite() {
+        viewModelScope.launch {
+            state.value.cocktail?.let {
+                if (it.isFavourite) {
+                    repository.removeFavouriteCocktailById(cocktailId)
+                } else {
+                    repository.favouriteCocktail(cocktailId)
+                }
+            }
         }
     }
 
@@ -78,5 +97,6 @@ data class CocktailDetailsState(
 /** Actions for the cocktail details screen. */
 sealed interface CocktailDetailsAction {
     data object Retry : CocktailDetailsAction
+    data object FavouriteToggle : CocktailDetailsAction
     data object GoBack : CocktailDetailsAction
 }

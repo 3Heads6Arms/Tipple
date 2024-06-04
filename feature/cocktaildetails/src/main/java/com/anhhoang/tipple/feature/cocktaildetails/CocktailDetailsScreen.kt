@@ -2,9 +2,6 @@ package com.anhhoang.tipple.feature.cocktaildetails
 
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.OverscrollEffect
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,13 +11,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -38,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -71,7 +69,12 @@ object CocktailDetailsScreenTestTags {
 @Composable
 fun CocktailDetailsScreen(state: CocktailDetailsState, onAction: (CocktailDetailsAction) -> Unit) {
     Scaffold(topBar = {
-        CocktailDetailsTopBar(state.cocktail?.name) { onAction(CocktailDetailsAction.GoBack) }
+        CocktailDetailsTopBar(
+            name = state.cocktail?.name,
+            isFavourite = state.cocktail?.isFavourite,
+            onNavigationAction = { onAction(CocktailDetailsAction.GoBack) },
+            onToggleFavourite = { onAction(CocktailDetailsAction.FavouriteToggle) },
+        )
     }) { paddingValues ->
         CocktailBody(
             Modifier.padding(paddingValues), state
@@ -94,8 +97,7 @@ private fun CocktailBody(
             )
 
             state.hasError -> ErrorView(
-                modifier = Modifier.testTag(COCKTAIL_ERROR),
-                onRetry = onRetry
+                modifier = Modifier.testTag(COCKTAIL_ERROR), onRetry = onRetry
             )
 
             else -> {
@@ -122,7 +124,8 @@ private fun CocktailDetails(cocktail: Cocktail) {
         )
         ItemsSection(
             Modifier.testTag(COCKTAIL_ADDITIONAL_INFORMATION),
-            stringResource(R.string.additional_information), listOfNotNull(
+            stringResource(R.string.additional_information),
+            listOfNotNull(
                 cocktail.servingGlass, cocktail.type, cocktail.category, cocktail.generation
             ),
         )
@@ -232,7 +235,10 @@ private fun ErrorView(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun CocktailDetailsTopBar(
-    name: String?, onNavigationAction: () -> Unit
+    name: String?,
+    isFavourite: Boolean?,
+    onNavigationAction: () -> Unit,
+    onToggleFavourite: () -> Unit
 ) {
     CenterAlignedTopAppBar(
         title = { Text(text = name ?: "", style = MaterialTheme.typography.titleLarge) },
@@ -245,11 +251,17 @@ private fun CocktailDetailsTopBar(
             }
         },
         actions = {
-            IconButton(onClick = {}) {
-                Icon(
-                    imageVector = Icons.Default.FavoriteBorder,
-                    contentDescription = stringResource(R.string.add_to_favorites)
-                )
+            isFavourite?.let {
+                val icon =
+                    if (isFavourite) Icons.Default.Favorite else Icons.Default.FavoriteBorder
+                val tint = if (isFavourite) Color.Red else MaterialTheme.colorScheme.onSurface
+                IconButton(onClick = onToggleFavourite) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = stringResource(R.string.add_to_favorites),
+                        tint = tint,
+                    )
+                }
             }
         },
     )
