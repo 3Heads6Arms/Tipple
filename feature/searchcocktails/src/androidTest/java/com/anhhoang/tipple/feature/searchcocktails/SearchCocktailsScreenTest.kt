@@ -2,11 +2,13 @@ package com.anhhoang.tipple.feature.searchcocktails
 
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
-import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import com.anhhoang.tipple.core.data.model.Cocktail
 import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.EMPTY_LIST
 import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.SEARCH_BAR
@@ -14,7 +16,7 @@ import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags
 import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.SEARCH_LOADING
 import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.SEARCH_RESULT
 import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.SEARCH_RESULTS
-
+import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 
@@ -23,13 +25,6 @@ class SearchCocktailsScreenTest {
     val composeRule = createComposeRule()
 
     private var capturedAction: SearchCocktailsAction? = null
-
-
-    private fun setUp(state: SearchCocktailsState) {
-        composeRule.setContent {
-            SearchCocktailsScreen(state) { capturedAction = it }
-        }
-    }
 
     @Test
     fun searchCocktailsScreen_expectSearchBarIsDisplayed() {
@@ -62,35 +57,7 @@ class SearchCocktailsScreenTest {
 
     @Test
     fun searchCocktailsScreen_cocktails_expectCocktailsAreDisplayed() {
-        setUp(
-            SearchCocktailsState(
-                cocktails = listOf(
-                    Cocktail(
-                        id = 1,
-                        name = "Mojito",
-                        instructions = "Mix all ingredients",
-                        thumbnail = "",
-                        generation = null,
-                        servingGlass = "",
-                        image = "",
-                        ingredients = emptyList(),
-                        category = "",
-                        type = "",
-                    ), Cocktail(
-                        id = 1,
-                        name = "Mojito 2",
-                        instructions = "Mix all ingredients 2",
-                        thumbnail = "",
-                        generation = null,
-                        servingGlass = "",
-                        image = "",
-                        ingredients = emptyList(),
-                        category = "",
-                        type = "",
-                    )
-                ),
-            )
-        )
+        setUp(SearchCocktailsState(cocktails = cocktails))
 
         composeRule.onNodeWithTag(SEARCH_RESULTS).assertIsDisplayed()
         composeRule.onAllNodesWithTag(SEARCH_RESULT).assertCountEquals(2)
@@ -98,5 +65,65 @@ class SearchCocktailsScreenTest {
         composeRule.onNodeWithText("Mix all ingredients").assertIsDisplayed()
         composeRule.onNodeWithText("Mojito 2").assertIsDisplayed()
         composeRule.onNodeWithText("Mix all ingredients 2").assertIsDisplayed()
+    }
+
+    @Test
+    fun retryClick_expectRetryAction() {
+        setUp(SearchCocktailsState(hasError = true))
+
+        composeRule.onNodeWithText("Retry").performClick()
+
+        assertThat(capturedAction).isEqualTo(SearchCocktailsAction.Retry)
+    }
+
+    @Test
+    fun search_expectSearchAction() {
+        setUp(SearchCocktailsState())
+
+        composeRule.onNode(hasSetTextAction()).performTextInput("Test")
+
+        assertThat(capturedAction).isEqualTo(SearchCocktailsAction.Search("Test"))
+    }
+
+    @Test
+    fun onCocktailClick_expectOpenCocktailAction() {
+        setUp(SearchCocktailsState(cocktails = cocktails))
+
+        composeRule.onNodeWithText("Mojito").performClick()
+
+        assertThat(capturedAction).isEqualTo(SearchCocktailsAction.OpenCocktail(1))
+    }
+
+    private fun setUp(state: SearchCocktailsState) {
+        composeRule.setContent { SearchCocktailsScreen(state) { capturedAction = it } }
+    }
+
+    companion object {
+        private val cocktails = listOf(
+            Cocktail(
+                id = 1,
+                name = "Mojito",
+                instructions = "Mix all ingredients",
+                thumbnail = "",
+                generation = null,
+                servingGlass = "",
+                image = "",
+                ingredients = emptyList(),
+                category = "",
+                type = "",
+            ), Cocktail(
+                id = 2,
+                name = "Mojito 2",
+                instructions = "Mix all ingredients 2",
+                thumbnail = "",
+                generation = null,
+                servingGlass = "",
+                image = "",
+                ingredients = emptyList(),
+                category = "",
+                type = "",
+            )
+        )
+
     }
 }
