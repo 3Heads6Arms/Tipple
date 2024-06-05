@@ -6,10 +6,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -27,6 +32,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -51,6 +58,7 @@ import coil.size.Size
 import com.anhhoang.tipple.core.data.model.Cocktail
 import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.EMPTY_LIST
 import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.SEARCH_BAR
+import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.SEARCH_COCKTAIL_OF_THE_DAY
 import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.SEARCH_ERROR
 import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.SEARCH_LOADING
 import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.SEARCH_RESULT
@@ -63,6 +71,7 @@ object SearchCocktailsScreenTestTags {
     const val SEARCH_RESULT = "SEARCH_RESULT"
     const val SEARCH_LOADING = "SEARCH_LOADING"
     const val SEARCH_ERROR = "SEARCH_ERROR"
+    const val SEARCH_COCKTAIL_OF_THE_DAY = "SEARCH_COCKTAIL_OF_THE_DAY"
     const val EMPTY_LIST = "EMPTY_LIST"
 }
 
@@ -85,28 +94,79 @@ fun SearchCocktailsScreen(state: SearchCocktailsState, onAction: (SearchCocktail
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             contentAlignment = Alignment.Center,
         ) {
-            if (state.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.testTag(SEARCH_LOADING))
-            } else if (state.hasError) {
-                SearchCocktailsError { onAction(SearchCocktailsAction.Retry) }
-            } else if (state.cocktails.isEmpty()) {
-                EmptyCocktailList()
-            } else {
-                CocktailList(
-                    state.cocktails,
-                    onCocktailClick = { onAction(SearchCocktailsAction.OpenCocktail(it)) },
-                    onFavouriteClick = { onAction(SearchCocktailsAction.FavouriteToggle(it)) },
-                )
+            when {
+                state.isLoading -> {
+                    CircularProgressIndicator(modifier = Modifier.testTag(SEARCH_LOADING))
+                }
+
+                state.isCocktailOfTheDay -> {
+                    CocktailOfTheDayBody(state, onAction)
+                }
+
+                else -> {
+                    SearchResultBody(state, onAction)
+                }
+
+
             }
         }
     }
 }
 
 @Composable
+private fun CocktailOfTheDayBody(
+    state: SearchCocktailsState, onAction: (SearchCocktailsAction) -> Unit,
+) {
+    when {
+        state.hasCocktailOfTheDayError -> {
+            SearchCocktailsError { onAction(SearchCocktailsAction.Retry) }
+        }
+
+        state.cocktailOfTheDay == null -> {
+            EmptyCocktailList { onAction(SearchCocktailsAction.Retry) }
+        }
+
+        else -> {
+            CocktailOfTheDayItem(
+                checkNotNull(state.cocktailOfTheDay),
+                onCocktailClick = {
+                    onAction(SearchCocktailsAction.OpenCocktail(state.cocktailOfTheDay.id))
+                },
+                onFavouriteClick = {
+                    onAction(SearchCocktailsAction.FavouriteToggle(state.cocktailOfTheDay.id))
+                },
+            )
+        }
+    }
+}
+
+@Composable
+private fun SearchResultBody(
+    state: SearchCocktailsState,
+    onAction: (SearchCocktailsAction) -> Unit,
+) {
+    when {
+        state.hasCocktailsError -> {
+            SearchCocktailsError { onAction(SearchCocktailsAction.Retry) }
+        }
+
+        state.cocktails.isEmpty() -> {
+            EmptyCocktailList { onAction(SearchCocktailsAction.Retry) }
+        }
+
+        else -> {
+            CocktailList(
+                state.cocktails,
+                onCocktailClick = { onAction(SearchCocktailsAction.OpenCocktail(it)) },
+                onFavouriteClick = { onAction(SearchCocktailsAction.FavouriteToggle(it)) },
+            )
+        }
+    }
+}
+
+@Composable
 private fun CocktailList(
-    cocktails: List<Cocktail>,
-    onCocktailClick: (Int) -> Unit,
-    onFavouriteClick: (Int) -> Unit
+    cocktails: List<Cocktail>, onCocktailClick: (Int) -> Unit, onFavouriteClick: (Int) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -125,10 +185,64 @@ private fun CocktailList(
 }
 
 @Composable
+private fun CocktailOfTheDayItem(
+    cocktailOfTheDay: Cocktail, onCocktailClick: () -> Unit, onFavouriteClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxSize()
+            .testTag(SEARCH_COCKTAIL_OF_THE_DAY),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        onClick = onCocktailClick,
+    ) {
+        Text(
+            text = stringResource(R.string.cocktail_of_the_day),
+            style = MaterialTheme.typography.titleLarge,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        CocktailImage(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(1f),
+            imageUrl = cocktailOfTheDay.image,
+            contentDescription = cocktailOfTheDay.name
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                cocktailOfTheDay.name,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f)
+            )
+            FavouriteButton(cocktailOfTheDay.isFavourite, onFavouriteClick)
+        }
+        CocktailAdditionalInfo(cocktailOfTheDay)
+    }
+}
+
+@Composable
+private fun CocktailAdditionalInfo(cocktail: Cocktail) {
+    Row(modifier = Modifier.wrapContentSize(unbounded = true)) {
+        for (label in listOfNotNull(
+            cocktail.category, cocktail.type, cocktail.servingGlass, cocktail.generation
+        )) {
+            SuggestionChip(
+                onClick = {},
+                label = { Text(label) },
+                colors = SuggestionChipDefaults.suggestionChipColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                ),
+                border = null,
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+        }
+    }
+}
+
+@Composable
 private fun CocktailItem(
-    cocktail: Cocktail,
-    onCocktailClick: () -> Unit,
-    onFavouriteClick: () -> Unit
+    cocktail: Cocktail, onCocktailClick: () -> Unit, onFavouriteClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -142,8 +256,15 @@ private fun CocktailItem(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CocktailImage(cocktail.image, cocktail.name)
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.SpaceBetween) {
+            CocktailImage(
+                modifier = Modifier.size(64.dp),
+                imageUrl = cocktail.image,
+                contentDescription = cocktail.name,
+            )
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.SpaceBetween,
+            ) {
                 Text(text = cocktail.name, style = MaterialTheme.typography.titleMedium)
                 Text(
                     text = cocktail.instructions,
@@ -152,32 +273,35 @@ private fun CocktailItem(
                     style = MaterialTheme.typography.labelMedium
                 )
             }
-            val icon =
-                if (cocktail.isFavourite) Icons.Default.Favorite else Icons.Default.FavoriteBorder
-            val tint = if (cocktail.isFavourite) Color.Red else MaterialTheme.colorScheme.onSurface
-            IconButton(onClick = onFavouriteClick) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = stringResource(R.string.add_to_favorites),
-                    tint = tint,
-                )
-            }
+            FavouriteButton(cocktail.isFavourite, onFavouriteClick)
         }
     }
 }
 
 @Composable
-private fun CocktailImage(imageUrl: String, contentDescription: String) {
+private fun FavouriteButton(
+    isFavourite: Boolean, onFavouriteClick: () -> Unit
+) {
+    val icon = if (isFavourite) Icons.Default.Favorite else Icons.Default.FavoriteBorder
+    val tint = if (isFavourite) Color.Red else MaterialTheme.colorScheme.onSurface
+    IconButton(onClick = onFavouriteClick) {
+        Icon(
+            imageVector = icon,
+            contentDescription = stringResource(R.string.add_to_favorites),
+            tint = tint,
+        )
+    }
+}
+
+@Composable
+private fun CocktailImage(modifier: Modifier, imageUrl: String, contentDescription: String) {
     val imageLoader = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current).data(imageUrl).size(Size.ORIGINAL)
             .build()
     )
 
     Box(
-        modifier = Modifier
-            .clip(MaterialTheme.shapes.medium)
-            .size(64.dp),
-        contentAlignment = Alignment.Center
+        modifier = modifier.clip(MaterialTheme.shapes.medium), contentAlignment = Alignment.Center
     ) {
         when (imageLoader.state) {
             is AsyncImagePainter.State.Error -> {
@@ -202,7 +326,7 @@ private fun CocktailImage(imageUrl: String, contentDescription: String) {
 }
 
 @Composable
-private fun EmptyCocktailList() {
+private fun EmptyCocktailList(onRetry: () -> Unit) {
     MessageView(
         modifier = Modifier.testTag(EMPTY_LIST),
         message = stringResource(R.string.such_emptiness),
@@ -213,7 +337,7 @@ private fun EmptyCocktailList() {
                 contentDescription = stringResource(R.string.such_emptiness)
             )
         },
-        action = {},
+        onRetry = onRetry
     )
 }
 
@@ -229,11 +353,7 @@ private fun SearchCocktailsError(onRetry: () -> Unit) {
                 contentDescription = stringResource(R.string.something_went_wrong)
             )
         },
-        action = {
-            TextButton(onClick = onRetry) {
-                Text(text = stringResource(R.string.retry))
-            }
-        },
+        onRetry = onRetry
     )
 }
 
@@ -242,12 +362,14 @@ private fun MessageView(
     modifier: Modifier,
     message: String,
     icon: @Composable () -> Unit,
-    action: @Composable () -> Unit,
+    onRetry: () -> Unit,
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = message, style = MaterialTheme.typography.headlineSmall)
         icon()
-        action()
+        TextButton(onClick = onRetry) {
+            Text(text = stringResource(R.string.retry))
+        }
     }
 }
 
@@ -308,7 +430,7 @@ private fun TippleSearchBarPreview_loading() {
 @Preview(showBackground = true, device = Devices.PIXEL_7)
 @Composable
 private fun TippleSearchBarPreview_error() {
-    SearchCocktailsScreen(SearchCocktailsState(hasError = true)) {}
+    SearchCocktailsScreen(SearchCocktailsState(hasCocktailsError = true)) {}
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_7)
