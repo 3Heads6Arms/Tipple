@@ -10,7 +10,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 
@@ -27,8 +26,9 @@ class SearchCocktailsUseCase @Inject constructor(
     )
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    val flow = query.debounce(500.milliseconds).mapLatest { tippleRepository.searchCocktails(it) }
-        .flowOn(coroutineContext)
+    val flow = query.debounce(500.milliseconds).mapLatest {
+        tippleRepository.searchCocktails(it)
+    }.flowOn(coroutineContext)
 
     operator fun invoke(searchQuery: String) {
         query.tryEmit(searchQuery)
