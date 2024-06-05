@@ -48,7 +48,14 @@ class SearchCocktailsViewModel @Inject constructor(
 
     private fun toggleFavourite(id: Int) {
         viewModelScope.launch {
-            state.value.cocktails.find { it.id == id }?.let {
+            val cocktail =
+                if (state.value.isCocktailOfTheDay) {
+                    state.value.cocktailOfTheDay
+                } else {
+                    state.value.cocktails.find { it.id == id }
+                }
+
+            cocktail?.let {
                 if (it.isFavourite) {
                     repository.removeFavouriteCocktailById(id)
                 } else {
