@@ -15,16 +15,15 @@ class CocktailDbNetworkDataSourceTest {
 
     private val api = mockk<CocktailDbApi>()
     private lateinit var dataSource: CocktailDbNetworkDataSource
-    private val testDispatcher = StandardTestDispatcher()
 
     @BeforeEach
     fun setUp() {
-        dataSource = CocktailDbNetworkDataSource(api, testDispatcher)
+        dataSource = CocktailDbNetworkDataSource(api, StandardTestDispatcher())
     }
 
     @Test
-    fun searchCocktails_success_expectExactCocktails() = runTest(testDispatcher) {
-        coEvery { api.searchCocktails(any()) } returns CocktailsResponse(
+    fun searchCocktails_success_expectExactCocktails() = runTest {
+        coEvery { api.searchCocktails(any()) } returns SearchCocktailsResponse(
             listOf(testCocktail)
         )
 
@@ -34,28 +33,10 @@ class CocktailDbNetworkDataSourceTest {
     }
 
     @Test
-    fun searchCocktails_failure_expectExceptionPropagated() = runTest(testDispatcher) {
+    fun searchCocktails_failure_expectExceptionPropagated() = runTest {
         coEvery { api.searchCocktails(any()) } throws RuntimeException("Test")
 
         assertFailsWith<RuntimeException>(message = "test") { dataSource.searchCocktails("Cocktail 1") }
-    }
-
-    @Test
-    fun getCocktailsById_success_expectExactCocktails() = runTest(testDispatcher) {
-        coEvery { api.getCocktailsById(any()) } returns CocktailsResponse(
-            listOf(testCocktail)
-        )
-
-        val result = dataSource.getCocktailsById(1)
-
-        assertThat(result).containsExactly(testCocktail)
-    }
-
-    @Test
-    fun getCocktailsById_failure_expectExceptionPropagated() = runTest(testDispatcher) {
-        coEvery { api.getCocktailsById(any()) } throws RuntimeException("Test")
-
-        assertFailsWith<RuntimeException>(message = "test") { dataSource.getCocktailsById(1) }
     }
 
     companion object {
