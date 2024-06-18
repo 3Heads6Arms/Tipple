@@ -28,7 +28,7 @@ class GetCocktailUseCase @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val flow = query.debounce(500.milliseconds).mapLatest { tippleRepository.getCocktailById(it) }
-        .flowOn(coroutineContext)
+        .distinctUntilChanged().flowOn(coroutineContext)
 
     operator fun invoke(id: Int) {
         query.tryEmit(id)
