@@ -54,7 +54,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:coroutines"))
     implementation(libs.kotlinx.serialization)
     implementation(libs.kotlinx.coroutines)
     implementation(libs.dagger.hilt)
