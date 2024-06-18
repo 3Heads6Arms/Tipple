@@ -21,35 +21,4 @@ interface TippleRepository {
      * @return The cocktail with the given ID.
      */
     suspend fun getCocktailById(id: Int): Resource<Cocktail>
-
-    /**
-     * Get a list of favourite cocktails.
-     *
-     * @return A list of favourite cocktails.
-     */
-    fun getFavouriteCocktails(): Flow<List<Int>>
-
-    /**
-     * Get a favourite cocktail by its ID.
-     *
-     * @param id The ID of the favourite cocktail to get.
-     * @return The favourite cocktail with the given ID.
-     */
-
-    fun getFavouriteCocktailById(id: Int): Flow<Int?>
-
-    /**
-     * Favourite a cocktail.
-     *
-     * @param id The ID of the cocktail to favourite.
-     */
-    suspend fun favouriteCocktail(id: Int)
-
-    /**
-     * Remove a favourite cocktail by its ID.
-     *
-     * @param id The ID of the favourite cocktail to remove.
-     */
-    suspend fun removeFavouriteCocktailById(id: Int)
-
 }

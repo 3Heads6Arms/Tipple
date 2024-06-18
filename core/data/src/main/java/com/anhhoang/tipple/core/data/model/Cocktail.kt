@@ -12,5 +12,4 @@ data class Cocktail(
     val type: String,
     val servingGlass: String,
     val category: String,
-    val isFavourite: Boolean = false
 )

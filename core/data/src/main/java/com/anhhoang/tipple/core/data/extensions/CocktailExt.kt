@@ -1,7 +1,6 @@
 package com.anhhoang.tipple.core.data.extensions
 
 import com.anhhoang.tipple.core.data.model.Cocktail
-import com.anhhoang.tipple.core.database.model.FavouriteCocktailEntity
 import com.anhhoang.tipple.core.network.model.NetworkCocktail
 
 /**
@@ -9,18 +8,20 @@ import com.anhhoang.tipple.core.network.model.NetworkCocktail
  * Internal because we don't want this to be exposed to the public API. This is also good practice since this package
  * does not own [NetworkCocktail].
  */
-internal fun NetworkCocktail.toCocktail(): Cocktail = Cocktail(
-    id = id,
-    name = name,
-    ingredients = getIngredients(),
-    instructions = instructions,
-    thumbnail = image,
-    image = image,
-    generation = generation,
-    type = type,
-    servingGlass = glass,
-    category = category,
-)
+internal fun NetworkCocktail.toCocktail(): Cocktail {
+    return Cocktail(
+        id = id,
+        name = name,
+        ingredients = getIngredients(),
+        instructions = instructions,
+        thumbnail = image,
+        image = image,
+        generation = generation,
+        type = type,
+        servingGlass = glass,
+        category = category,
+    )
+}
 
 private fun NetworkCocktail.getIngredients(): List<String> = buildList {
     ingredient1?.let { add("$it ${measure1 ?: ""}".trim()) }
