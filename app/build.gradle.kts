@@ -22,7 +22,6 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-        multiDexEnabled = true
     }
 
     buildTypes {
@@ -56,7 +55,6 @@ android {
 
 dependencies {
     implementation(project(":design"))
-    implementation(project(":feature:searchcocktails"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -65,15 +63,11 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.nav.compose)
     implementation(libs.androidx.hilt.nav.compose)
     implementation(libs.dagger.hilt)
     implementation(libs.kotlinx.serialization)
     ksp(libs.dagger.hilt.compiler)
-    implementation(libs.androidx.multidex)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
