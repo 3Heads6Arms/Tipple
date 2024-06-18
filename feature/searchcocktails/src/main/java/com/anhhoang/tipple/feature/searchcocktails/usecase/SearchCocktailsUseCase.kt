@@ -19,12 +19,15 @@ class SearchCocktailsUseCase @Inject constructor(
     private val tippleRepository: TippleRepository,
 ) {
     private val query = MutableSharedFlow<String>(
-        replay = 1, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST
+        replay = 1,
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val flow = query.debounce(500.milliseconds).mapLatest { tippleRepository.searchCocktails(it) }
-        .distinctUntilChanged().flowOn(coroutineContext)
+        .distinctUntilChanged()
+        .flowOn(coroutineContext)
 
     operator fun invoke(searchQuery: String) {
         query.tryEmit(searchQuery)
