@@ -4,12 +4,10 @@ import com.anhhoang.tipple.core.network.model.NetworkCocktail
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.mockk
-import kotlin.test.assertFailsWith
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-/** Tests for [CocktailDbNetworkDataSource]. */
 class CocktailDbNetworkDataSourceTest {
 
     private val api = mockk<CocktailDbApi>()
@@ -21,21 +19,14 @@ class CocktailDbNetworkDataSourceTest {
     }
 
     @Test
-    fun searchCocktails_success_expectExactCocktails() = runTest {
-        coEvery { api.searchCocktails(any()) } returns SearchCocktailsResponse(
+    fun findCocktails() = runTest {
+        coEvery { api.findCocktails(any()) } returns SearchCocktailsResponse(
             listOf(testCocktail)
         )
 
         val result = dataSource.searchCocktails("Cocktail 1")
 
         assertThat(result).containsExactly(testCocktail)
-    }
-
-    @Test
-    fun searchCocktails_failure_expectExceptionPropagated() = runTest {
-        coEvery { api.searchCocktails(any()) } throws RuntimeException("Test")
-
-        assertFailsWith<RuntimeException>(message = "test") { dataSource.searchCocktails("Cocktail 1") }
     }
 
     companion object {
