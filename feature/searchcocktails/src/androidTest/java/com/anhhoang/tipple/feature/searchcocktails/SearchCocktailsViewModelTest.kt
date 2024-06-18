@@ -1,10 +1,10 @@
 package com.anhhoang.tipple.feature.searchcocktails
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.anhhoang.tipple.core.data.model.Cocktail
 import com.anhhoang.tipple.core.data.model.Resource
 import com.anhhoang.tipple.core.data.repository.TippleRepository
-import com.anhhoang.tipple.feature.searchcocktails.usecase.GetCocktailOfTheDayUseCase
 import com.anhhoang.tipple.feature.searchcocktails.usecase.SearchCocktailsUseCase
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
@@ -21,16 +21,14 @@ import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 /** Tests for [SearchCocktailsViewModel]. */
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class SearchCocktailsViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private val repository = mockk<TippleRepository>(relaxed = true)
     private val searchCocktailsUseCase = SearchCocktailsUseCase(testDispatcher, repository)
-    private val getCocktailOfTheDayUseCase = GetCocktailOfTheDayUseCase(testDispatcher, repository)
     private lateinit var viewModel: SearchCocktailsViewModel
 
     @Before
@@ -41,13 +39,11 @@ class SearchCocktailsViewModelTest {
     @Test
     fun getState_initial_isEqualsToSearchCocktailsStateDefault() {
         setupViewModel()
-        assertThat(viewModel.state.value).isEqualTo(SearchCocktailsState(isLoading = true))
+        assertThat(viewModel.state.value).isEqualTo(SearchCocktailsState())
     }
 
     @Test
     fun onAction_search_success_expectStateWithCocktails() = runTest(testDispatcher) {
-        every { repository.getCocktailOfTheDay() } returns flowOf(null)
-        coEvery { repository.getRandomCocktail() } returns Resource.Success(cocktail)
         coEvery { repository.searchCocktails(any()) } returns Resource.Success(listOf(cocktail))
         coEvery { repository.getFavouriteCocktails() } returns flowOf(emptyList())
         setupViewModel()
@@ -64,41 +60,35 @@ class SearchCocktailsViewModelTest {
             assertThat(awaitItem()).isEqualTo(
                 SearchCocktailsState(
                     searchQuery = "Cocktail 1",
-                    cocktailOfTheDay = cocktail,
-                )
-            )
-            assertThat(awaitItem()).isEqualTo(
-                SearchCocktailsState(
-                    searchQuery = "Cocktail 1",
                     cocktails = listOf(cocktail),
-                    cocktailOfTheDay = cocktail,
                 )
             )
         }
     }
 
     @Test
-    fun onAction_search_successWithFavourite_expectStateWithFavouriteCocktails() =
-        runTest(testDispatcher) {
-            coEvery { repository.searchCocktails(any()) } returns Resource.Success(listOf(cocktail))
-            coEvery { repository.getFavouriteCocktails() } returns flowOf(listOf(1))
-            setupViewModel()
+    fun onAction_search_successWithFavourite_expectStateWithFavouriteCocktails() = runTest(testDispatcher) {
+        coEvery { repository.searchCocktails(any()) } returns Resource.Success(listOf(cocktail))
+        coEvery { repository.getFavouriteCocktails() } returns flowOf(listOf(1))
+        setupViewModel()
 
-            viewModel.onAction(SearchCocktailsAction.Search("Cocktail 1"))
+        viewModel.onAction(SearchCocktailsAction.Search("Cocktail 1"))
 
-            viewModel.state.test {
-                awaitItem()
-                awaitItem()
-
-                assertThat(awaitItem()).isEqualTo(
-                    SearchCocktailsState(
-                        searchQuery = "Cocktail 1",
-                        cocktails = listOf(favouriteCocktail),
-                        hasCocktailOfTheDayError = true,
-                    )
+        viewModel.state.test {
+            assertThat(awaitItem()).isEqualTo(
+                SearchCocktailsState(
+                    searchQuery = "Cocktail 1",
+                    isLoading = true,
                 )
-            }
+            )
+            assertThat(awaitItem()).isEqualTo(
+                SearchCocktailsState(
+                    searchQuery = "Cocktail 1",
+                    cocktails = listOf(favouriteCocktail),
+                )
+            )
         }
+    }
 
     @Test
     fun onAction_search_failure_expectStateWithError() = runTest(testDispatcher) {
@@ -111,13 +101,11 @@ class SearchCocktailsViewModelTest {
         viewModel.state.test {
             // Ignore loading state, already checked by other test.
             awaitItem()
-            awaitItem()
 
             assertThat(awaitItem()).isEqualTo(
                 SearchCocktailsState(
                     searchQuery = "Cocktail 1",
-                    hasCocktailsError = true,
-                    hasCocktailOfTheDayError = true,
+                    hasError = true,
                 )
             )
         }
@@ -137,17 +125,14 @@ class SearchCocktailsViewModelTest {
             // Unused states, already checked by other tests.
             awaitItem()
             awaitItem()
-            awaitItem()
 
             viewModel.onAction(SearchCocktailsAction.Retry)
-            awaitItem()
             awaitItem()
 
             assertThat(awaitItem()).isEqualTo(
                 SearchCocktailsState(
                     searchQuery = "Cocktail 1",
                     cocktails = listOf(cocktail),
-                    hasCocktailOfTheDayError = true,
                 )
             )
         }
@@ -162,7 +147,6 @@ class SearchCocktailsViewModelTest {
         viewModel.onAction(SearchCocktailsAction.Search("Cocktail 1"))
 
         viewModel.state.test {
-            awaitItem()
             awaitItem()
             awaitItem()
 
@@ -184,7 +168,6 @@ class SearchCocktailsViewModelTest {
         viewModel.state.test {
             awaitItem()
             awaitItem()
-            awaitItem()
 
             viewModel.onAction(SearchCocktailsAction.FavouriteToggle(1))
             advanceUntilIdle()
@@ -194,8 +177,7 @@ class SearchCocktailsViewModelTest {
     }
 
     private fun setupViewModel() {
-        viewModel =
-            SearchCocktailsViewModel(searchCocktailsUseCase, getCocktailOfTheDayUseCase, repository)
+        viewModel = SearchCocktailsViewModel(searchCocktailsUseCase, repository)
     }
 
     companion object {

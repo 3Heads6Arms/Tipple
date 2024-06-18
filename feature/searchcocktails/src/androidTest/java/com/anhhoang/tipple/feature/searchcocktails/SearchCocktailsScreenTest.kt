@@ -21,10 +21,7 @@ import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
 class SearchCocktailsScreenTest {
     @get:Rule
     val composeRule = createComposeRule()
@@ -47,7 +44,7 @@ class SearchCocktailsScreenTest {
 
     @Test
     fun searchCocktailsScreen_error_expectErrorIsDisplayed() {
-        setUp(SearchCocktailsState(searchQuery = "Test", hasCocktailsError = true))
+        setUp(SearchCocktailsState(hasError = true))
 
         composeRule.onNodeWithTag(SEARCH_ERROR).assertIsDisplayed()
         composeRule.onNodeWithText("Retry").assertIsDisplayed()
@@ -62,7 +59,7 @@ class SearchCocktailsScreenTest {
 
     @Test
     fun searchCocktailsScreen_cocktails_expectCocktailsAreDisplayed() {
-        setUp(SearchCocktailsState(searchQuery = "Test", cocktails = cocktails))
+        setUp(SearchCocktailsState(cocktails = cocktails))
 
         composeRule.onNodeWithTag(SEARCH_RESULTS).assertIsDisplayed()
         composeRule.onAllNodesWithTag(SEARCH_RESULT).assertCountEquals(2)
@@ -74,7 +71,7 @@ class SearchCocktailsScreenTest {
 
     @Test
     fun retryClick_expectRetryAction() {
-        setUp(SearchCocktailsState(searchQuery = "Test", hasCocktailsError = true))
+        setUp(SearchCocktailsState(hasError = true))
 
         composeRule.onNodeWithText("Retry").performClick()
 
@@ -92,7 +89,7 @@ class SearchCocktailsScreenTest {
 
     @Test
     fun onCocktailClick_expectOpenCocktailAction() {
-        setUp(SearchCocktailsState(searchQuery = "Test", cocktails = cocktails))
+        setUp(SearchCocktailsState(cocktails = cocktails))
 
         composeRule.onNodeWithText("Mojito").performClick()
 
@@ -101,7 +98,7 @@ class SearchCocktailsScreenTest {
 
     @Test
     fun onFavouriteClick_expectFavouriteAction() {
-        setUp(SearchCocktailsState(searchQuery = "Test", cocktails = cocktails))
+        setUp(SearchCocktailsState(cocktails = cocktails))
 
         composeRule.onAllNodesWithContentDescription("Add to favorites").onFirst().performClick()
 

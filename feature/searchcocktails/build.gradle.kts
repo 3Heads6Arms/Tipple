@@ -44,17 +44,11 @@ android {
             )
         }
     }
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
-    }
 }
 
 dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:coroutines"))
-    implementation(project(":core:database"))
     implementation(libs.kotlinx.coroutines)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.core.ktx)
@@ -70,15 +64,14 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.dagger.hilt)
     ksp(libs.dagger.hilt.compiler)
-    testImplementation(libs.junit4)
-    testImplementation(libs.robolectric)
-    testImplementation(libs.androidx.espresso.core)
-    testImplementation(libs.androidx.junit)
-    testImplementation(libs.mockk.android)
-    testImplementation(libs.mockk.agent)
-    testImplementation(libs.truth)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.turbine)
-    testImplementation(libs.androidx.ui.test.junit4)
-    testImplementation(libs.androidx.ui.test.manifest)
+    androidTestImplementation(libs.junit4)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.mockk.agent)
+    androidTestImplementation(libs.truth)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(libs.turbine)
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.androidx.ui.test.manifest)
 }

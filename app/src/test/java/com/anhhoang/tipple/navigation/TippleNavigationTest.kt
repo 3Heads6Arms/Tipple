@@ -1,11 +1,11 @@
 package com.anhhoang.tipple.navigation
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createEmptyComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.test.core.app.ActivityScenario
+import androidx.compose.ui.test.performTextInput
 import com.anhhoang.tipple.MainActivity
 import com.anhhoang.tipple.core.coroutines.BlockingContext
 import com.anhhoang.tipple.core.coroutines.LightweightContext
@@ -15,9 +15,8 @@ import com.anhhoang.tipple.core.data.di.RepositoryModule
 import com.anhhoang.tipple.core.data.model.Cocktail
 import com.anhhoang.tipple.core.data.model.Resource
 import com.anhhoang.tipple.core.data.repository.TippleRepository
-import com.anhhoang.tipple.feature.cocktaildetails.CocktailDetailsScreenTestTags.COCKTAIL_LOADING
 import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.SEARCH_BAR
-import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.SEARCH_COCKTAIL_OF_THE_DAY
+import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.SEARCH_RESULT
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -26,13 +25,11 @@ import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.mockk
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -53,7 +50,7 @@ class TippleNavigationTest {
     val hiltRule = HiltAndroidRule(this)
 
     @get:Rule(order = 1)
-    val composeRule = createEmptyComposeRule()
+    val composeRule = createAndroidComposeRule<MainActivity>()
 
     @Inject
     lateinit var repository: TippleRepository
@@ -63,27 +60,6 @@ class TippleNavigationTest {
     fun setUp() {
         ShadowLog.setupLogging()
         hiltRule.inject()
-
-        every { repository.getCocktailOfTheDay() } returns flowOf(null)
-        every { repository.getFavouriteCocktails() } returns flowOf(emptyList())
-        coEvery { repository.searchCocktails(any()) } returns Resource.Success(emptyList())
-        coEvery { repository.getRandomCocktail() } returns
-                Resource.Success(
-                    Cocktail(
-                        id = 1,
-                        name = "Mojito",
-                        instructions = "Mix all ingredients",
-                        thumbnail = "",
-                        generation = null,
-                        servingGlass = "",
-                        image = "",
-                        ingredients = emptyList(),
-                        category = "",
-                        type = "",
-                    )
-                )
-
-        ActivityScenario.launch(MainActivity::class.java)
     }
 
     @Test
@@ -95,24 +71,32 @@ class TippleNavigationTest {
     @Test
     fun testNavigation_navigateToDetailsScreen_expectDetailsScreen() =
         runTest(MockDispatchersModule.testDispatchers) {
+            coEvery { repository.searchCocktails(any()) } returns
+                    Resource.Success(
+                        listOf(
+                            Cocktail(
+                                id = 1,
+                                name = "Mojito",
+                                instructions = "Mix all ingredients",
+                                thumbnail = "",
+                                generation = null,
+                                servingGlass = "",
+                                image = "",
+                                ingredients = emptyList(),
+                                category = "",
+                                type = "",
+                            )
+                        )
+                    )
+
+
+            composeRule.onNode(hasSetTextAction()).performTextInput("Mojito")
             advanceUntilIdle()
+            composeRule.onNodeWithTag(SEARCH_RESULT).performClick()
 
-            composeRule.onNodeWithTag(SEARCH_COCKTAIL_OF_THE_DAY).performClick()
-
-            composeRule.onNodeWithTag(COCKTAIL_LOADING).assertIsDisplayed()
+            composeRule.onNodeWithTag(SEARCH_BAR).assertDoesNotExist()
         }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun detailScreen_goBack_expectMainScreen() =
-        runTest(MockDispatchersModule.testDispatchers) {
-            advanceUntilIdle()
-            composeRule.onNodeWithTag(SEARCH_COCKTAIL_OF_THE_DAY).performClick()
-
-            composeRule.onNodeWithContentDescription("Go back").performClick()
-
-            composeRule.onNodeWithTag(SEARCH_BAR).assertIsDisplayed()
-        }
 }
 
 @TestInstallIn(components = [SingletonComponent::class], replaces = [DispatchersModule::class])
