@@ -20,23 +20,19 @@ class CocktailDbNetworkDataSource @Inject internal constructor(
 
     override suspend fun searchCocktails(name: String): List<NetworkCocktail> =
         withContext(blockingContext) {
-            api.searchCocktails(name).drinks?: emptyList()
+            api.searchCocktails(name).drinks
         }
 
-    override suspend fun getCocktailById(id: Int): List<NetworkCocktail> =
+    override suspend fun getCocktailsById(id: Int): List<NetworkCocktail> =
         withContext(blockingContext) {
-            api.getCocktailsById(id).drinks?: emptyList()
+            api.getCocktailsById(id).drinks
         }
-
-    override suspend fun getRandomCocktail(): List<NetworkCocktail> = withContext(blockingContext) {
-        api.getRandomCocktail().drinks?: emptyList()
-    }
 }
 
 /** Exact DTO for the search endpoint. */
 @Serializable
 internal data class CocktailsResponse(
-    val drinks: List<NetworkCocktail>?
+    val drinks: List<NetworkCocktail> = emptyList()
 )
 
 /** Endpoints of TheCocktailDb. */
@@ -46,7 +42,4 @@ internal interface CocktailDbApi {
 
     @GET("lookup.php")
     suspend fun getCocktailsById(@Query("i") id: Int): CocktailsResponse
-
-    @GET("random.php")
-    suspend fun getRandomCocktail(): CocktailsResponse
 }

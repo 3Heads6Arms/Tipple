@@ -2,7 +2,6 @@ package com.anhhoang.tipple.core.data.repository
 
 import com.anhhoang.tipple.core.data.model.Cocktail
 import com.anhhoang.tipple.core.data.model.Resource
-import com.anhhoang.tipple.core.database.model.CocktailOfTheDay
 import kotlinx.coroutines.flow.Flow
 
 /** Repository to handle data from network or local storage for the Tipple app. */
@@ -53,11 +52,4 @@ interface TippleRepository {
      */
     suspend fun removeFavouriteCocktailById(id: Int)
 
-    /** Get cocktail of the day. */
-    fun getCocktailOfTheDay(): Flow<CocktailOfTheDay?>
-
-    /** Save the cocktail of the day. */
-    suspend fun saveCocktailOfTheDay(id: Int)
-
-    suspend fun getRandomCocktail(): Resource<Cocktail>
 }
