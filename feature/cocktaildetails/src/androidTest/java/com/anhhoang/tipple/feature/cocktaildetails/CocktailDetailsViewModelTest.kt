@@ -16,11 +16,8 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
 /** Tests for [CocktailDetailsViewModel]. */
-@RunWith(RobolectricTestRunner::class)
 class CocktailDetailsViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
@@ -33,14 +30,8 @@ class CocktailDetailsViewModelTest {
         setUp()
 
         viewModel.state.test {
-            awaitItem()
-
-            assertThat(awaitItem()).isEqualTo(
-                CocktailDetailsState(
-                    isLoading = false,
-                    cocktail = cocktail,
-                )
-            )
+            assertThat(awaitItem()).isEqualTo(CocktailDetailsState(isLoading = true))
+            assertThat(awaitItem()).isEqualTo(CocktailDetailsState(cocktail = cocktail))
         }
     }
 
@@ -50,13 +41,9 @@ class CocktailDetailsViewModelTest {
         setUp()
 
         viewModel.state.test {
-            assertThat(awaitItem()).isEqualTo(CocktailDetailsState(isLoading = true))
-            assertThat(awaitItem()).isEqualTo(
-                CocktailDetailsState(
-                    isLoading = false,
-                    hasError = true,
-                )
-            )
+            awaitItem()
+
+            assertThat(awaitItem()).isEqualTo(CocktailDetailsState(hasError = true))
         }
     }
 
@@ -78,12 +65,7 @@ class CocktailDetailsViewModelTest {
             viewModel.onAction(CocktailDetailsAction.Retry)
             awaitItem()
 
-            assertThat(awaitItem()).isEqualTo(
-                CocktailDetailsState(
-                    isLoading = false,
-                    cocktail = cocktail,
-                )
-            )
+            assertThat(awaitItem()).isEqualTo(CocktailDetailsState(cocktail = cocktail))
         }
     }
 

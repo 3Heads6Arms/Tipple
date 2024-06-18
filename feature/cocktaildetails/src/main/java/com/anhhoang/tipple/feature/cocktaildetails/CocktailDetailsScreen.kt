@@ -1,6 +1,5 @@
 package com.anhhoang.tipple.feature.cocktaildetails
 
-import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.OverscrollEffect
 import androidx.compose.foundation.gestures.Orientation
@@ -40,7 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,24 +48,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
 import com.anhhoang.tipple.core.data.model.Cocktail
-import com.anhhoang.tipple.feature.cocktaildetails.CocktailDetailsScreenTestTags.COCKTAIL_ADDITIONAL_INFORMATION
-import com.anhhoang.tipple.feature.cocktaildetails.CocktailDetailsScreenTestTags.COCKTAIL_ERROR
-import com.anhhoang.tipple.feature.cocktaildetails.CocktailDetailsScreenTestTags.COCKTAIL_IMAGE
-import com.anhhoang.tipple.feature.cocktaildetails.CocktailDetailsScreenTestTags.COCKTAIL_INGREDIENTS
-import com.anhhoang.tipple.feature.cocktaildetails.CocktailDetailsScreenTestTags.COCKTAIL_INSTRUCTIONS
-import com.anhhoang.tipple.feature.cocktaildetails.CocktailDetailsScreenTestTags.COCKTAIL_LOADING
 
-@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-object CocktailDetailsScreenTestTags {
-    const val COCKTAIL_IMAGE = "COCKTAIL_IMAGE"
-    const val COCKTAIL_INSTRUCTIONS = "COCKTAIL_INSTRUCTIONS"
-    const val COCKTAIL_INGREDIENTS = "COCKTAIL_INGREDIENTS"
-    const val COCKTAIL_ADDITIONAL_INFORMATION = "COCKTAIL_ADDITIONAL_INFORMATION"
-    const val COCKTAIL_LOADING = "COCKTAIL_LOADING"
-    const val COCKTAIL_ERROR = "COCKTAIL_ERROR"
-}
-
-/** Screen for the cocktail details and actions. */
 @Composable
 fun CocktailDetailsScreen(state: CocktailDetailsState, onAction: (CocktailDetailsAction) -> Unit) {
     Scaffold(topBar = {
@@ -87,17 +68,8 @@ private fun CocktailBody(
         modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center
     ) {
         when {
-            state.isLoading -> CircularProgressIndicator(
-                modifier = Modifier.testTag(
-                    COCKTAIL_LOADING
-                )
-            )
-
-            state.hasError -> ErrorView(
-                modifier = Modifier.testTag(COCKTAIL_ERROR),
-                onRetry = onRetry
-            )
-
+            state.isLoading -> CircularProgressIndicator()
+            state.hasError -> ErrorView(modifier = Modifier, onRetry = onRetry)
             else -> {
                 val cocktail = checkNotNull(state.cocktail)
                 CocktailDetails(cocktail)
@@ -115,35 +87,26 @@ private fun CocktailDetails(cocktail: Cocktail) {
     ) {
         CocktailImage(cocktail.image, cocktail.name)
         InstructionSection(cocktail.instructions)
+        ItemsSection(stringResource(R.string.ingredients), cocktail.ingredients)
         ItemsSection(
-            Modifier.testTag(COCKTAIL_INGREDIENTS),
-            stringResource(R.string.ingredients),
-            cocktail.ingredients,
-        )
-        ItemsSection(
-            Modifier.testTag(COCKTAIL_ADDITIONAL_INFORMATION),
             stringResource(R.string.additional_information), listOfNotNull(
                 cocktail.servingGlass, cocktail.type, cocktail.category, cocktail.generation
-            ),
+            )
         )
     }
 }
 
 @Composable
 private fun InstructionSection(instructions: String) {
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .testTag(COCKTAIL_INSTRUCTIONS)
-    ) {
+    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
         Text(stringResource(R.string.instructions), style = MaterialTheme.typography.titleMedium)
         Text(instructions, style = MaterialTheme.typography.bodyLarge)
     }
 }
 
 @Composable
-private fun ItemsSection(modifier: Modifier = Modifier, title: String, items: List<String>) {
-    Column(modifier = modifier) {
+private fun ItemsSection(title: String, items: List<String>) {
+    Column {
         Text(
             title,
             style = MaterialTheme.typography.titleMedium,
@@ -179,8 +142,7 @@ private fun CocktailImage(imageUrl: String, contentDescription: String) {
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clip(MaterialTheme.shapes.medium)
             .aspectRatio(1f)
-            .fillMaxWidth()
-            .testTag(COCKTAIL_IMAGE),
+            .fillMaxWidth(),
         contentAlignment = Alignment.Center,
     ) {
         when (imageLoader.state) {
