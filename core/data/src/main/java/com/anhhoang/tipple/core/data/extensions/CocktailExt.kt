@@ -1,6 +1,7 @@
 package com.anhhoang.tipple.core.data.extensions
 
 import com.anhhoang.tipple.core.data.model.Cocktail
+import com.anhhoang.tipple.core.data.model.Ingredient
 import com.anhhoang.tipple.core.network.model.NetworkCocktail
 
 /**
@@ -23,20 +24,20 @@ internal fun NetworkCocktail.toCocktail(): Cocktail {
     )
 }
 
-private fun NetworkCocktail.getIngredients(): List<String> = buildList {
-    ingredient1?.let { add("$it ${measure1 ?: ""}".trim()) }
-    ingredient2?.let { add("$it ${measure2 ?: ""}".trim()) }
-    ingredient3?.let { add("$it ${measure3 ?: ""}".trim()) }
-    ingredient4?.let { add("$it ${measure4 ?: ""}".trim()) }
-    ingredient5?.let { add("$it ${measure5 ?: ""}".trim()) }
-    ingredient6?.let { add("$it ${measure6 ?: ""}".trim()) }
-    ingredient7?.let { add("$it ${measure7 ?: ""}".trim()) }
-    ingredient8?.let { add("$it ${measure8 ?: ""}".trim()) }
-    ingredient9?.let { add("$it ${measure9 ?: ""}".trim()) }
-    ingredient10?.let { add("$it ${measure10 ?: ""}".trim()) }
-    ingredient11?.let { add("$it ${measure11 ?: ""}".trim()) }
-    ingredient12?.let { add("$it ${measure12 ?: ""}".trim()) }
-    ingredient13?.let { add("$it ${measure13 ?: ""}".trim()) }
-    ingredient14?.let { add("$it ${measure14 ?: ""}".trim()) }
-    ingredient15?.let { add("$it ${measure15 ?: ""}".trim()) }
+private fun NetworkCocktail.getIngredients(): List<Ingredient> = buildList {
+    ingredient1?.let { add(Ingredient(it, measure1)) }
+    ingredient2?.let { add(Ingredient(it, measure2)) }
+    ingredient3?.let { add(Ingredient(it, measure3)) }
+    ingredient4?.let { add(Ingredient(it, measure4)) }
+    ingredient5?.let { add(Ingredient(it, measure5)) }
+    ingredient6?.let { add(Ingredient(it, measure6)) }
+    ingredient7?.let { add(Ingredient(it, measure7)) }
+    ingredient8?.let { add(Ingredient(it, measure8)) }
+    ingredient9?.let { add(Ingredient(it, measure9)) }
+    ingredient10?.let { add(Ingredient(it, measure10)) }
+    ingredient11?.let { add(Ingredient(it, measure11)) }
+    ingredient12?.let { add(Ingredient(it, measure12)) }
+    ingredient13?.let { add(Ingredient(it, measure13)) }
+    ingredient14?.let { add(Ingredient(it, measure14)) }
+    ingredient15?.let { add(Ingredient(it, measure15)) }
 }
