@@ -13,12 +13,4 @@ interface TippleRepository {
      * @return A list of cocktails that match the name.
      */
     suspend fun searchCocktails(name: String): Resource<List<Cocktail>>
-
-    /**
-     * Get a cocktail by its ID.
-     *
-     * @param id The ID of the cocktail to get.
-     * @return The cocktail with the given ID.
-     */
-    suspend fun getCocktailById(id: Int): Resource<Cocktail>
 }
