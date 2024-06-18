@@ -14,10 +14,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 
-/**
- * Use case for searching cocktails.
- * Helps with transforming data into flow, to provide a seamless data update.
- */
 class SearchCocktailsUseCase @Inject constructor(
     @LightweightContext private val coroutineContext: CoroutineContext,
     private val tippleRepository: TippleRepository,
@@ -28,7 +24,7 @@ class SearchCocktailsUseCase @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val flow = query.debounce(500.milliseconds).mapLatest { tippleRepository.searchCocktails(it) }
-        .flowOn(coroutineContext)
+        .distinctUntilChanged().flowOn(coroutineContext)
 
     operator fun invoke(searchQuery: String) {
         query.tryEmit(searchQuery)
