@@ -1,7 +1,5 @@
 package com.anhhoang.tipple.core.network.di
 
-import android.content.Context
-import coil.ImageLoader
 import com.anhhoang.tipple.core.network.BuildConfig
 import com.anhhoang.tipple.core.network.TippleNetworkDataSource
 import com.anhhoang.tipple.core.network.retrofit.CocktailDbApi
@@ -10,7 +8,6 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 import kotlinx.serialization.json.Json
@@ -38,20 +35,9 @@ class NetworkModule {
     @Provides
     @Singleton
     internal fun provideNetworkApi(json: Json, okHttpCallFactory: dagger.Lazy<Call.Factory>) =
-        Retrofit.Builder().baseUrl(BuildConfig.COCKTAIL_DB_URL)
-            .callFactory { okHttpCallFactory.get().newCall(it) }
+        Retrofit.Builder().baseUrl(BuildConfig.COCKTAIL_DB_URL).callFactory { okHttpCallFactory.get().newCall(it) }
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType())).build()
             .create(CocktailDbApi::class.java)
-
-    @Provides
-    @Singleton
-    internal fun provideImageLoader(
-        @ApplicationContext context: Context,
-        okHttpCallFactory: dagger.Lazy<Call.Factory>,
-    ) = ImageLoader.Builder(context)
-        .callFactory { okHttpCallFactory.get() }
-        .crossfade(true)
-        .build()
 }
 
 @InstallIn(SingletonComponent::class)

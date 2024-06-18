@@ -64,7 +64,6 @@ dependencies {
     implementation(libs.squareup.retrofit.kotlinx.serialization.converter)
     implementation(libs.squareup.okhttp)
     implementation(libs.squareup.okhttp.logging)
-    implementation(libs.coil)
     testImplementation(kotlin("test"))
     testImplementation(libs.junit)
     testRuntimeOnly(libs.junit.engine)
