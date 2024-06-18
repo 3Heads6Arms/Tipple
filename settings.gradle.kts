@@ -22,4 +22,3 @@ dependencyResolutionManagement {
 rootProject.name = "Tipple"
 include(":app")
 include(":design")
-include(":core:network")
