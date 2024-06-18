@@ -1,6 +1,5 @@
 package com.anhhoang.tipple.feature.searchcocktails
 
-import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,7 +32,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,18 +43,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
 import com.anhhoang.tipple.core.data.model.Cocktail
-import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.EMPTY_LIST
-import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.SEARCH_BAR
-import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.SEARCH_ERROR
-import com.anhhoang.tipple.feature.searchcocktails.SearchCocktailsScreenTestTags.SEARCH_RESULTS
-
-@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-object SearchCocktailsScreenTestTags {
-    const val SEARCH_BAR = "SEARCH_BAR"
-    const val SEARCH_RESULTS = "SEARCH_RESULTS"
-    const val SEARCH_ERROR = "SEARCH_ERROR"
-    const val EMPTY_LIST = "EMPTY_LIST"
-}
 
 /** Screen for searching for cocktails. */
 @Composable
@@ -93,9 +79,7 @@ fun SearchCocktailsScreen(state: SearchCocktailsState, onAction: (SearchCocktail
 @Composable
 private fun CocktailList(cocktails: List<Cocktail>) {
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .testTag(SEARCH_RESULTS),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(cocktails) {
@@ -168,7 +152,6 @@ private fun CocktailImage(imageUrl: String, contentDescription: String) {
 @Composable
 private fun EmptyCocktailList() {
     MessageView(
-        modifier = Modifier.testTag(EMPTY_LIST),
         message = stringResource(R.string.such_emptiness),
         icon = {
             Icon(
@@ -184,7 +167,6 @@ private fun EmptyCocktailList() {
 @Composable
 private fun SearchCocktailsError(onRetry: () -> Unit) {
     MessageView(
-        modifier = Modifier.testTag(SEARCH_ERROR),
         message = stringResource(R.string.something_went_wrong),
         icon = {
             Icon(
@@ -203,12 +185,11 @@ private fun SearchCocktailsError(onRetry: () -> Unit) {
 
 @Composable
 private fun MessageView(
-    modifier: Modifier,
     message: String,
     icon: @Composable () -> Unit,
     action: @Composable () -> Unit,
 ) {
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = message, style = MaterialTheme.typography.headlineSmall)
         icon()
         action()
@@ -227,8 +208,7 @@ private fun TippleSearchBar(
     SearchBar(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp)
-            .testTag(SEARCH_BAR),
+            .padding(16.dp),
         query = searchQuery,
         leadingIcon = {
             Icon(
@@ -292,7 +272,8 @@ private fun TippleSearchBarPreview_withItems() {
                     ingredients = emptyList(),
                     category = "",
                     type = "",
-                ), Cocktail(
+                ),
+                Cocktail(
                     id = 1,
                     name = "Mojito",
                     instructions = "Mix all ingredients",
