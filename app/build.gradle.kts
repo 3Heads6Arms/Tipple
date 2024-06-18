@@ -64,10 +64,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":design"))
-    implementation(project(":feature:searchcocktails"))
-    implementation(project(":feature:cocktaildetails"))
-    implementation(project(":core:network"))
+    implementation(projects.design)
+    implementation(projects.core.network)
+    implementation(projects.feature.searchcocktails)
+    implementation(projects.feature.cocktaildetails)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

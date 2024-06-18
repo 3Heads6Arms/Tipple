@@ -52,8 +52,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:data"))
-    implementation(project(":core:coroutines"))
+    implementation(projects.core.data)
+    implementation(projects.core.coroutines)
     implementation(libs.kotlinx.coroutines)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.core.ktx)

@@ -40,7 +40,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:coroutines"))
+    implementation(projects.core.coroutines)
     implementation(libs.kotlinx.coroutines)
     implementation(libs.androidx.room)
     implementation(libs.androidx.room.ktx)
