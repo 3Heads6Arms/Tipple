@@ -1,4 +1,4 @@
-package com.anhhoang.tipple.core.data.model
+package com.anhhoang.tipple.core.model
 
 /** Domain model for the Tipple app. */
 data class Cocktail(

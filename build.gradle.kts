@@ -2,17 +2,10 @@
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.jetbrains.kotlin.android) apply false
+    alias(libs.plugins.jetbrains.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.google.dagger) apply false
     alias(libs.plugins.google.ksp) apply false
-    alias(libs.plugins.secrets.gradle) apply false
-    alias(libs.plugins.junit5) apply false
-}
-
-buildscript {
-    dependencies {
-        classpath(libs.secrets.gradle)
-    }
 }
